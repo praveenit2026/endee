@@ -1,6 +1,6 @@
 # Resume Matcher — Full Stack AI App
 
-An AI-powered resume vs. job description analyzer built with **FastAPI** (backend) and **React + Vite** (frontend), using **Claude** (Anthropic) for intelligent analysis.
+An AI-powered resume vs. job description analyzer built with **FastAPI** (backend) and **React + Vite** (frontend), using **SambaNova Cloud** (Meta Llama) for intelligent analysis.
 
 ```
 ┌─────────────────┐      HTTP       ┌───────────────────┐
@@ -8,12 +8,12 @@ An AI-powered resume vs. job description analyzer built with **FastAPI** (backen
 │   (port 5173)   │ ◀─────────────  │   (port 8000)      │
 └─────────────────┘   JSON result   └────────┬──────────┘
                                              │
-                                    Anthropic API (Claude)
+                                     SambaNova Cloud API
                                              │
-                                    ┌────────▼──────────┐
-                                    │  Match Score &     │
-                                    │  Skill Analysis    │
-                                    └───────────────────┘
+                                     ┌───────▼───────────┐
+                                     │  Match Score &     │
+                                     │  Skill Analysis    │
+                                     └───────────────────┘
 ```
 
 ## Features
@@ -33,7 +33,7 @@ An AI-powered resume vs. job description analyzer built with **FastAPI** (backen
 
 - Python 3.11+
 - Node.js 18+
-- An [Anthropic API key](https://console.anthropic.com/)
+- A [SambaNova Cloud API key](https://cloud.sambanova.ai/)
 
 ---
 
@@ -51,7 +51,7 @@ pip install -r requirements.txt
 
 # Set your API key
 cp .env.example .env
-# Edit .env and add your ANTHROPIC_API_KEY
+# Edit .env and add your SAMBANOVA_API_KEY
 
 # Run the server
 uvicorn main:app --reload --port 8000
@@ -121,9 +121,9 @@ App runs at: http://localhost:5173
 ```
 resume-matcher/
 ├── backend/
-│   ├── main.py              # FastAPI app, routes, Claude integration
+│   ├── main.py              # FastAPI app, routes, SambaNova integration
 │   ├── requirements.txt     # Python dependencies
-│   └── .env.example         # API key template
+│   └── .env                 # API keys (ignored by git)
 │
 └── frontend/
     ├── index.html
@@ -148,7 +148,7 @@ resume-matcher/
 
 ### Backend — Railway / Render / Fly.io
 
-1. Set `ANTHROPIC_API_KEY` as an environment variable
+1. Set `SAMBANOVA_API_KEY` as an environment variable
 2. Start command: `uvicorn main:app --host 0.0.0.0 --port $PORT`
 
 ### Frontend — Vercel / Netlify
