@@ -1,142 +1,126 @@
-# Resume Matcher — Full Stack AI App
+<div align="center">
+  <h1>✨ Resume Matcher ✨</h1>
+  <p><b>An AI-Powered Full-Stack Application for Intelligent Resume Analysis</b></p>
+  
+  [![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com/)
+  [![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactjs.org/)
+  [![Vite](https://img.shields.io/badge/Vite-B73BFE?style=for-the-badge&logo=vite&logoColor=FFD62E)](https://vitejs.dev/)
+  [![Render](https://img.shields.io/badge/Render-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://render.com/)
+</div>
 
-An AI-powered resume vs. job description analyzer built with **FastAPI** (backend) and **React + Vite** (frontend), using **SambaNova Cloud** (Meta Llama) for intelligent analysis.
+<br/>
 
-```
-┌─────────────────┐      HTTP       ┌───────────────────┐
-│   React + Vite  │ ─────────────▶  │   FastAPI Backend  │
-│   (port 5173)   │ ◀─────────────  │   (port 8000)      │
-└─────────────────┘   JSON result   └────────┬──────────┘
-                                             │
-                                     SambaNova Cloud API
-                                             │
-                                     ┌───────▼───────────┐
-                                     │  Match Score &     │
-                                     │  Skill Analysis    │
-                                     └───────────────────┘
-```
+Have you ever wondered what happens to your resume after you hit "Submit" on a job board? **Resume Matcher** pulls back the curtain. 
 
-## Features
-
-- Upload resume as **PDF**, **DOCX**, or **TXT** — or paste text directly
-- Paste any job description
-- Instant **ATS score** (0–100) with verdict
-- **Matched vs. missing skills** breakdown
-- **Experience & education alignment** analysis
-- **5 actionable coaching suggestions**
+This full-stack application uses cutting-edge AI (powered by **SambaNova Cloud**) to act as an expert ATS (Applicant Tracking System) and career coach. It analyzes a resume against a job description, scores the match, identifies missing skills, and provides actionable advice.
 
 ---
 
-## Setup
+## 🏗️ How It Works (Architecture)
 
-### Prerequisites
+The platform is designed to be blazing fast and scalable, utilizing a modern split-stack architecture.
 
-- Python 3.11+
-- Node.js 18+
-- A [SambaNova Cloud API key](https://cloud.sambanova.ai/)
+```mermaid
+sequenceDiagram
+    participant User
+    participant Frontend as ⚛️ React (Vite)
+    participant Backend as ⚡ FastAPI 
+    participant VectorDB as 🧠 Endee DB
+    participant AI as 🤖 SambaNova LLM
+
+    User->>Frontend: Uploads Resume (PDF/DOCX) & Job Description
+    Frontend->>Backend: POST /api/analyze (Multipart Form)
+    
+    rect rgb(234, 240, 248)
+    Note over Backend: Text Extraction (PyPDF2/docx)
+    Backend->>Backend: Parses document text
+    end
+    
+    Backend->>VectorDB: Stores resume embedding (Optional context)
+    VectorDB-->>Backend: Returns similar past resumes
+    
+    Backend->>AI: Prompts Llama 3.1 with Resume, JD, and Schema
+    AI-->>Backend: Returns structured JSON (Score, Skills, Advice)
+    
+    Backend-->>Frontend: Sends formatted JSON response
+    Frontend-->>User: Renders interactive Dashboard rings & metrics
+```
 
 ---
 
-### 1. Backend
+## ✨ Key Features
+
+*   📄 **Multi-Format Support:** Drag and drop PDFs, DOCX files, or simply paste raw text.
+*   🎯 **Instant ATS Score:** Get a precise 0-100 compatibility score and a clear verdict (e.g., "Strong Match").
+*   🔍 **Skill Gap Analysis:** A side-by-side breakdown of the skills you nailed and the buzzwords you're missing.
+*   🧠 **Contextual Coaching:** 5 highly specific, actionable suggestions to tailor your resume for that exact role.
+*   ⚡ **Lightning Fast:** Built on FastAPI and SambaNova's high-speed inference cloud.
+
+---
+
+## 💻 Local Development Setup
+
+Want to run it on your own machine? It's easy! You'll need Python 3.11+, Node.js 18+, and a [SambaNova Cloud API key](https://cloud.sambanova.ai/).
+
+### 1. The Backend (FastAPI)
 
 ```bash
 cd backend
-
-# Create virtual environment
 python -m venv venv
 source venv/bin/activate        # Windows: venv\Scripts\activate
 
-# Install dependencies
+# Install the Python magic
 pip install -r requirements.txt
 
-# Set your API key
+# Setup your environment variables
 cp .env.example .env
-# Edit .env and add your SAMBANOVA_API_KEY
+# Open .env and add your SAMBANOVA_API_KEY!
 
-# Run the server
+# Fire it up!
 uvicorn main:app --reload --port 8000
 ```
+*Your API is now running at `http://localhost:8000`. You can view the automated Swagger docs at `/docs`.*
 
-API docs available at: http://localhost:8000/docs
-
----
-
-### 2. Frontend
+### 2. The Frontend (React/Vite)
 
 ```bash
 cd frontend
-
-# Install dependencies
 npm install
 
-# Start dev server (proxies /api → localhost:8000)
+# Start the blazing-fast Vite dev server
 npm run dev
 ```
-
-App runs at: http://localhost:5173
-
----
-
-## API Endpoints
-
-| Method | Path | Description |
-|--------|------|-------------|
-| GET | `/` | Health check |
-| GET | `/health` | Health check |
-| POST | `/api/analyze` | Analyze resume vs JD |
-| POST | `/api/parse-resume` | Extract text from uploaded file |
-
-### POST `/api/analyze`
-
-**Form data:**
-
-| Field | Type | Required |
-|-------|------|----------|
-| `job_description` | string | ✅ |
-| `file` | file (.pdf/.docx/.txt) | either/or |
-| `resume_text` | string | either/or |
-
-**Response:**
-
-```json
-{
-  "score": 78,
-  "verdict": "Good Match",
-  "summary": "Strong technical background with most required skills...",
-  "matchedSkills": ["Python", "FastAPI", "REST API", "PostgreSQL"],
-  "missingSkills": ["Kubernetes", "GraphQL"],
-  "suggestions": [
-    "Add specific metrics to your work experience bullets...",
-    ...
-  ],
-  "experienceAlignment": "5 years of backend experience aligns well with the senior role...",
-  "educationAlignment": "CS degree meets the requirement."
-}
-```
+*Your beautiful UI is now running at `http://localhost:5173`.*
 
 ---
 
-## Deployment
+## 🚀 One-Click Production Deployment (Render)
 
-This project is configured for automated deployment on **Render** using a single Blueprint (`render.yaml`).
+We've automated the entire deployment process using **Render Blueprints**. With a single configuration file (`render.yaml`), Render knows exactly how to build and host both the FastAPI backend and the React frontend simultaneously.
 
-### Deploy Steps
+![Render Deployment Process](https://render.com/images/render-logo-wordmark.svg)
 
-1. Create an account on [Render](https://render.com).
-2. Go to your Dashboard → **New** → **Blueprint**.
-3. Connect your GitHub repository containing this project.
-4. Render will automatically detect the `render.yaml` file and create two services:
-   - `resume-matcher-backend` (Docker web service)
-   - `resume-matcher-frontend` (Static Site)
-5. During setup, configure the following Environment Variables:
+### Deploying the Complete Stack
 
-**Backend (`resume-matcher-backend`):**
-- `SAMBANOVA_API_KEY`: Your SambaNova Cloud API key
-- `SAMBANOVA_BASE_URL`: `https://api.sambanova.ai/v1` (optional, default provided)
-- `SAMBANOVA_MODEL`: `Meta-Llama-3.1-8B-Instruct` (optional, default provided)
-- `ENDEE_URL`: The URL of your Endee Vector DB (if using one, otherwise leave blank)
+1. Create a free account on [Render](https://render.com).
+2. Go to your Dashboard and click **New +** → **Blueprint**.
+3. Connect your GitHub repository containing this code.
+4. Render will automatically read the `render.yaml` file and prepare two distinct services:
+   *   `resume-matcher-backend` (A deployed Docker web service)
+   *   `resume-matcher-frontend` (A lightning-fast global Static Site)
+5. **Configure your Environment Variables:**
 
-**Frontend (`resume-matcher-frontend`):**
-- `VITE_API_URL`: Set this to your backend's Render URL (e.g., `https://resume-matcher-backend-xxxx.onrender.com`). *Note: Set this after the backend is created.*
+   **For the Backend (`resume-matcher-backend`):**
+   *   `SAMBANOVA_API_KEY`: Your secret SambaNova Cloud API key.
+   *   *(Optional)* `ENDEE_URL`: If you are using an external Vector Database. Leave dummy text if not.
 
-6. Click **Apply** to deploy both services automatically!
+   **For the Frontend (`resume-matcher-frontend`):**
+   *   `VITE_API_URL`: The URL of your newly created backend (e.g., `https://resume-matcher-backend-xxxx.onrender.com`). *Note: Render creates the backend first, so you copy the URL and paste it here!*
+
+6. Click **Apply**. 
+
+🎉 That's it! Render will automatically pull the Docker image, assign dynamic ports (`$PORT`), build the static site, and wire everything together. Your intelligent Resume Matcher is live on the internet! 
+
+---
+
+*Built with ❤️ for modern job seekers.*
